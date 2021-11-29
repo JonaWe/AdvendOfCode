@@ -16,7 +16,7 @@ writeAllDays currentDay maxDays template
     print "Done!"
 
 makeDirForDay :: Int -> IO ()
-makeDirForDay day = createDirectoryIfMissing True $ "../" ++ show day
+makeDirForDay day = createDirectoryIfMissing True $ "../" ++ getDayString day
 
 writeDay :: Int -> String -> IO ()
 writeDay day template =
@@ -27,12 +27,17 @@ writeDay day template =
     currentPermissions <- getPermissions runFilePath
     setPermissions runFilePath currentPermissions {executable = True}
   where
-    dayString = show day
+    dayString = getDayString day
     dirPath = "../" ++ dayString ++ "/"
     haskellFilePath = dirPath ++ "day" ++ dayString ++ ".hs"
     inputFilePath = dirPath ++ "input.txt"
     runFilePath = dirPath ++ "run.sh"
     runFileContent = "#!/bin/bash\n\nghc day" ++ dayString ++ ".hs\n./day" ++ dayString ++ " input.txt"
+
+getDayString :: Int -> String
+getDayString day
+  | day < 10 = "0" ++ show day
+  | otherwise = show day
 
 replaceDay :: Int -> String -> String
 replaceDay day = replace '*' $ show day
