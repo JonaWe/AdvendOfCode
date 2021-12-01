@@ -18,7 +18,7 @@ run file = do
       intInputList :: [Int]
       intInputList = map read inputList
       part1 = countIncreased intInputList
-      part2 = 0 -- TODO implement solution
+      part2 = countThreeMeasurementWindowIncreased intInputList
   putStrLn $ "Solution Day 1 Part 1: " ++ show part1 ++ "."
   putStrLn $ "Solution Day 1 Part 2: " ++ show part2 ++ "."
 
@@ -28,3 +28,10 @@ countIncreased [last] = 0
 countIncreased (first : second : tail)
   | first < second = 1 + countIncreased (second : tail)
   | otherwise = countIncreased $ second : tail
+
+countThreeMeasurementWindowIncreased :: [Int] -> Int
+countThreeMeasurementWindowIncreased [] = 0
+countThreeMeasurementWindowIncreased (a : b : c : d : tail)
+  | a + b + c < b + c + d = 1 + countThreeMeasurementWindowIncreased (b : c : d : tail)
+  | otherwise = countThreeMeasurementWindowIncreased (b : c : d : tail)
+countThreeMeasurementWindowIncreased (head : tail) = 0
