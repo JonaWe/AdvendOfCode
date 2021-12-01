@@ -15,7 +15,16 @@ run :: String -> IO ()
 run file = do
   input <- readFile file
   let inputList = lines input
-      part1 = input -- TODO implement solution
-      part2 = input -- TODO implement solution
+      intInputList :: [Int]
+      intInputList = map read inputList
+      part1 = countIncreased intInputList
+      part2 = 0 -- TODO implement solution
   putStrLn $ "Solution Day 1 Part 1: " ++ show part1 ++ "."
   putStrLn $ "Solution Day 1 Part 2: " ++ show part2 ++ "."
+
+countIncreased :: [Int] -> Int
+countIncreased [] = 0
+countIncreased [last] = 0
+countIncreased (first : second : tail)
+  | first < second = 1 + countIncreased (second : tail)
+  | otherwise = countIncreased $ second : tail
