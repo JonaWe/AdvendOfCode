@@ -4,7 +4,6 @@
     Solution created by Jona Wessendorf.
 -}
 
-import Language.Haskell.TH (Dec (ForeignD))
 import System.Environment (getArgs)
 
 main :: IO ()
