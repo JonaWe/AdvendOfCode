@@ -17,11 +17,51 @@ run file = do
   let inputList = lines input
       binaryInputList = map readBinaryString inputList
       part1 = solution1 binaryInputList
-      part2 = 0 -- TODO implement solution
+      part2 = solution2 binaryInputList
   putStrLn $ "Solution Day 3 Part 1: " ++ show part1 ++ "."
   putStrLn $ "Solution Day 3 Part 2: " ++ show part2 ++ "."
 
 type BinaryNumber = [Int]
+
+--
+-- PART 2
+--
+
+solution2 :: [BinaryNumber] -> Int
+solution2 input = oxygenGeneratorRating input * scrubberRating input
+
+oxygenGeneratorRating :: [BinaryNumber] -> Int
+oxygenGeneratorRating input = hornerScheme (calculateRating input 0 interpretOGR) 0
+
+scrubberRating :: [BinaryNumber] -> Int
+scrubberRating input = hornerScheme (calculateRating input 0 interpretSR) 0
+
+calculateRating :: [BinaryNumber] -> Int -> (Int -> Int) -> BinaryNumber
+calculateRating [x] _ _ = x
+calculateRating input pos interpret = calculateRating filtered (pos + 1) interpret
+  where
+    currentMax = interpret $ countZerosAndOnesAtPos input pos 0
+    filtered = filterAtPos input pos currentMax
+
+filterAtPos :: [BinaryNumber] -> Int -> Int -> [BinaryNumber]
+filterAtPos input index number = filter (\current -> current !! index == number) input
+
+interpretSR :: Int -> Int
+interpretSR x = if x >= 0 then 0 else 1
+
+interpretOGR :: Int -> Int
+interpretOGR x = if x >= 0 then 1 else 0
+
+countZerosAndOnesAtPos :: [BinaryNumber] -> Int -> Int -> Int
+countZerosAndOnesAtPos [] _ count = count
+countZerosAndOnesAtPos (x : xs) pos count
+  | x !! pos == 0 = countZerosAndOnesAtPos xs pos $ count - 1
+  | x !! pos == 1 = countZerosAndOnesAtPos xs pos $ count + 1
+  | otherwise = countZerosAndOnesAtPos xs pos count
+
+--
+-- PART 1
+--
 
 solution1 :: [BinaryNumber] -> Int
 solution1 input = epsilonRateDecimal * gammaRateDecimal
