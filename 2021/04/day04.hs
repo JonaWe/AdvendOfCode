@@ -4,6 +4,7 @@
     Solution created by Jona Wessendorf.
 -}
 
+import Data.List ((\\))
 import System.Environment (getArgs)
 
 main :: IO ()
@@ -26,7 +27,7 @@ run file = do
 
       -- solutions
       part1 = solution1 boards drawnNumbers 1
-      part2 = 0 -- TODO implement solution
+      part2 = solution2 boards drawnNumbers 1
   putStrLn $ "Solution Day 4 Part 1: " ++ show part1 ++ "."
   putStrLn $ "Solution Day 4 Part 2: " ++ show part2 ++ "."
 
@@ -37,10 +38,33 @@ run file = do
 type Board = [[Int]]
 
 --
+-- PART 2
+--
+
+solution2 :: [Board] -> [Int] -> Int -> Int
+solution2 boards numbers maxNumber =
+  if length currentWinningBoards /= length boards
+    then solution2 boards numbers $ maxNumber + 1
+    else sumAllUnchecked lastWinningBoard currentNumbers * last currentNumbers
+  where
+    currentNumbers = take maxNumber numbers
+    currentWinningBoards = getAllWinningBoards boards currentNumbers
+    lastTurnWinningBoards = getAllWinningBoards boards $ init currentNumbers
+    lastWinningBoard = head $ currentWinningBoards \\ lastTurnWinningBoards
+
+getAllWinningBoards :: [Board] -> [Int] -> [Board]
+getAllWinningBoards [] _ = []
+getAllWinningBoards (board : remaining) numbers = case boardWon of
+  Nothing -> getAllWinningBoards remaining numbers
+  Just newWinnerBoard -> newWinnerBoard : getAllWinningBoards remaining numbers
+  where
+    boardWon = checkIfBoardWon board numbers
+
+--
 -- PART 1
 --
 
---solution1 :: [Board] -> [Int] -> Int -> Int
+solution1 :: [Board] -> [Int] -> Int -> Int
 solution1 boards numbers maxNumbers = case currentBoardsWin of
   Nothing -> solution1 boards numbers $ maxNumbers + 1
   Just winnerBoard -> sumAllUnchecked winnerBoard currentNumbers * last currentNumbers
