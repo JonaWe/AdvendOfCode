@@ -19,7 +19,7 @@ run file = do
   let inputList = lines input
       inputLines = map parseLinseString inputList
       part1 = solution1 inputLines
-      part2 = 0 -- TODO implement solution
+      part2 = solution2 inputLines
   putStrLn $ "Solution Day 5 Part 1: " ++ show part1 ++ "."
   putStrLn $ "Solution Day 5 Part 2: " ++ show part2 ++ "."
 
@@ -34,6 +34,18 @@ type Line = (Point, Point)
 type PointCount = (Point, Int)
 
 --
+-- PART 2
+--
+
+solution2 :: [Line] -> Int
+solution2 lines = length dangerousPoints
+  where
+    pointCount = foldr addPointToPointCount [] points
+    dangerousPoints = getDangerousPoints pointCount
+
+    points = concatMap getPointsFromLineWithDiagonal lines
+
+--
 -- PART 1
 --
 
@@ -44,6 +56,19 @@ solution1 lines = length dangerousPoints
     dangerousPoints = getDangerousPoints pointCount
 
     points = concat $ map getPointsFromLine lines
+
+getPointsFromLineWithDiagonal :: Line -> [Point]
+getPointsFromLineWithDiagonal ((x1, y1), (x2, y2))
+  | x1 == x2 && y1 == y2 = [(x1, y1)]
+  | x1 == x2 && y2 > y1 = (x1, y2) : getPointsFromLineWithDiagonal ((x1, y1), (x2, y2 - 1))
+  | x1 == x2 && y2 < y1 = (x1, y2) : getPointsFromLineWithDiagonal ((x1, y1), (x2, y2 + 1))
+  | y1 == y2 && x2 > x1 = (x2, y2) : getPointsFromLineWithDiagonal ((x1, y1), (x2 - 1, y2))
+  | y1 == y2 && x2 < x1 = (x2, y2) : getPointsFromLineWithDiagonal ((x1, y1), (x2 + 1, y2))
+  | y1 < y2 && x1 < x2 = (x2, y2) : getPointsFromLineWithDiagonal ((x1, y1), (x2 - 1, y2 - 1))
+  | y1 < y2 && x1 > x2 = (x2, y2) : getPointsFromLineWithDiagonal ((x1, y1), (x2 + 1, y2 - 1))
+  | y1 > y2 && x1 < x2 = (x2, y2) : getPointsFromLineWithDiagonal ((x1, y1), (x2 - 1, y2 + 1))
+  | y1 > y2 && x1 > x2 = (x2, y2) : getPointsFromLineWithDiagonal ((x1, y1), (x2 + 1, y2 + 1))
+  | otherwise = []
 
 getPointsFromLine :: Line -> [Point]
 getPointsFromLine ((x1, y1), (x2, y2))
