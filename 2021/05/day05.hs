@@ -4,6 +4,13 @@
     Solution created by Jona Wessendorf.
 -}
 
+{-
+    This is a solution to the day 5 puzzle of the Advent of Code.
+
+    Solution created by Jona Wessendorf.
+-}
+
+import Data.Foldable (Foldable (foldl'))
 import Data.List (elemIndex)
 import Data.Maybe (fromMaybe)
 import System.Environment (getArgs)
@@ -78,18 +85,10 @@ getPointsFromLine ((x1, y1), (x2, y2))
   | otherwise = []
 
 addPointToPointCount :: Point -> [PointCount] -> [PointCount]
-addPointToPointCount (x, y) pointCount =
-  if pointIndex /= -1
-    then modifyAt pointIndex (\(point, count) -> (point, count + 1)) pointCount
-    else ((x, y), 1) : pointCount
-  where
-    pointIndex = pointCountContainsPoint pointCount (x, y) 0
-
-pointCountContainsPoint :: [PointCount] -> Point -> Int -> Int
-pointCountContainsPoint [] _ _ = -1
-pointCountContainsPoint (((x1, y1), _) : tail) (x2, y2) index
-  | x1 == x2 && y1 == y2 = index
-  | otherwise = pointCountContainsPoint tail (x2, y2) $ index + 1
+addPointToPointCount (x, y) [] = [((x, y), 1)]
+addPointToPointCount (x, y) (((x2, y2), count) : tail)
+  | x == x2 && y == y2 = ((x, y), count + 1) : tail
+  | otherwise = ((x2, y2), count) : addPointToPointCount (x, y) tail
 
 getDangerousPoints :: [PointCount] -> [PointCount]
 getDangerousPoints = filter (\(_, count) -> count >= 2)
@@ -97,13 +96,6 @@ getDangerousPoints = filter (\(_, count) -> count >= 2)
 --
 -- HELPERS
 --
-
-modifyAt :: Int -> (a -> a) -> [a] -> [a]
-modifyAt index fun list = initPart ++ fun current : tailPart
-  where
-    initPart = take index list
-    tailPart = drop (index + 1) list
-    current = list !! index
 
 parseLinseString :: String -> Line
 parseLinseString input = (parsePointString firstPointString, parsePointString secondPointString)
